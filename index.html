@@ -97,11 +97,34 @@
   .tile .v{font-family:var(--serif); font-size:23px; font-weight:600; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.25}
   .tile .s{font-size:11px; color:var(--muted)}
 
-  .barrow{display:flex; align-items:center; gap:10px; padding:5px 0}
-  .barrow .lb{flex:0 0 74px; font-size:12.5px; color:var(--ink-2)}
-  .barrow .bar{flex:1; height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden}
-  .barrow .bar i{display:block; height:100%; background:var(--tc); border-radius:999px}
-  .barrow .vv{flex:0 0 42px; text-align:right; font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+  /* 교과별 평균 등급 — 1~5등급 눈금 위에 과목마다 점, 평균은 세로 막대 */
+  .gscale{display:flex; align-items:center; gap:10px}
+  .gscale .lb{flex:0 0 74px; font-size:12.5px; color:var(--ink-2)}
+  .gscale .tk{flex:1; position:relative; height:30px; margin:0 8px}
+  .gscale .vv{flex:0 0 42px; text-align:right; font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+  .gscale.head .tk{height:18px}
+  .gscale.head .tk span{position:absolute; top:0; transform:translateX(-50%); font-size:11px; color:var(--muted); white-space:nowrap}
+  .gscale .gl{position:absolute; top:0; bottom:0; width:1px; margin-left:-.5px; background:var(--rule-2)}
+  .gscale .span{position:absolute; top:50%; height:2px; margin-top:-1px; background:color-mix(in srgb, var(--tc) 35%, transparent)}
+  .gscale .dot{position:absolute; top:50%; width:7px; height:7px; border-radius:50%; background:color-mix(in srgb, var(--tc) 50%, var(--paper))}
+  .gscale .avg{position:absolute; top:50%; width:4px; height:20px; margin:-10px 0 0 -2px; border-radius:2px; background:var(--tc); box-shadow:0 0 0 2px var(--paper)}
+
+  /* 학기별 추이 — 위쪽이 1등급 */
+  .tlegend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-bottom:10px}
+  .tlegend span{display:inline-flex; align-items:center; gap:6px}
+  .tlegend i{width:14px; height:3px; border-radius:2px; background:var(--tc)}
+  .tlegend .all i{background:repeating-linear-gradient(90deg, var(--tc) 0 4px, transparent 4px 7px)}
+  .trend{display:grid; grid-template-columns:44px 1fr; height:170px}
+  .trend .ylab{position:relative}
+  .trend .ylab span{position:absolute; right:8px; transform:translateY(-50%); font-size:11px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums}
+  .trend .plot{position:relative}
+  .trend svg{position:absolute; inset:0; overflow:visible}
+  .trend .hl{stroke:var(--rule-2); stroke-width:1}
+  .trend .ln{stroke-width:2; stroke-linecap:round}
+  .trend .ln.all{stroke-width:1.5; stroke-dasharray:4 4}
+  .trend .pt{stroke:var(--paper); stroke-width:2}
+  .xlab{position:relative; height:18px; margin:4px 0 0 44px}
+  .xlab span{position:absolute; transform:translateX(-50%); font-size:11px; color:var(--muted); white-space:nowrap}
 
   .gtbl-wrap{overflow-x:auto; margin:0 -20px; padding:0 20px}
   .gtbl{border-collapse:collapse; width:100%; font-size:13px; min-width:460px}
@@ -1048,6 +1071,184 @@ window.IPGYEOL = {"builtin-yonsei-chucheon":[{"year":2025,"track":"학생부교�
     return a.area === b.area ? (a.subject < b.subject ? -1 : 1) : (a.area < b.area ? -1 : 1);
   }
 
+  function groupColor(gid){
+    return (GROUPS.filter(function(g){ return g.id === gid; })[0] || GROUPS[3]).color;
+  }
+  function shortArea(a){
+    return a.replace("(역사/도덕포함)", "").replace("기술·가정/정보", "기가·정보").replace("제2외국어/한문", "제2외/한문");
+  }
+  function svgEl(tag, attrs){
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for(var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  /* 교과별 평균 등급
+     등급은 '양' 이 아니라 '자리' 라서 막대 길이 대신 1~5등급 눈금 위의 위치로 보여 줍니다.
+     과목 하나가 점 하나, 학점 가중 평균이 굵은 세로 막대입니다. 점이 퍼진 폭이 곧 과목 간 편차입니다. */
+  function gradePos(g){ return ((g - 1) / 4 * 100) + "%"; }
+  function areaScale(rows){
+    var sec = el("section");
+    var h = el("div", "sec-head");
+    h.appendChild(el("h2", null, "교과별 평균 등급"));
+    h.appendChild(el("span", "sec-note", "점 = 과목 · 막대 = 학점 가중 평균"));
+    sec.appendChild(h);
+
+    var head = el("div", "gscale head");
+    head.appendChild(el("div", "lb"));
+    var ht = el("div", "tk");
+    for(var g = 1; g <= 5; g++){
+      var lab = el("span", null, g + "등급");
+      lab.style.left = gradePos(g);
+      ht.appendChild(lab);
+    }
+    head.appendChild(ht);
+    head.appendChild(el("div", "vv"));
+    sec.appendChild(head);
+
+    ALL_AREAS.forEach(function(a){
+      var rs = rows.filter(function(r){ return r.area === a && r.rank; });
+      if(!rs.length) return;
+      var v = wAvgRank(rs);
+      var row = el("div", "gscale");
+      row.style.setProperty("--tc", groupColor(groupOf(a)));
+      row.appendChild(el("div", "lb", shortArea(a)));
+      var tk = el("div", "tk");
+      for(var g = 1; g <= 5; g++){
+        var gl = el("i", "gl");
+        gl.style.left = gradePos(g);
+        tk.appendChild(gl);
+      }
+      var ranks = rs.map(function(r){ return r.rank; });
+      var lo = Math.min.apply(null, ranks), hi = Math.max.apply(null, ranks);
+      if(hi > lo){
+        var span = el("i", "span");
+        span.style.left = gradePos(lo);
+        span.style.width = ((hi - lo) / 4 * 100) + "%";
+        tk.appendChild(span);
+      }
+      // 같은 등급의 과목은 세 개씩 세로로 쌓고, 넘치면 옆에 한 줄 더 놓습니다
+      var byRank = {};
+      rs.slice().sort(byTerm).forEach(function(r){ (byRank[r.rank] = byRank[r.rank] || []).push(r); });
+      Object.keys(byRank).forEach(function(k){
+        var list = byRank[k], cols = Math.ceil(list.length / 3);
+        list.forEach(function(r, i){
+          var col = Math.floor(i / 3), inCol = Math.min(3, list.length - col * 3);
+          var dx = (col - (cols - 1) / 2) * 9 - 3.5, dy = ((i % 3) - (inCol - 1) / 2) * 9 - 3.5;
+          var d = el("i", "dot");
+          d.style.left = gradePos(r.rank);
+          d.style.transform = "translate(" + dx + "px," + dy + "px)";
+          d.title = termLabel(termKey(r)) + " " + r.subject + " · " + r.rank + "등급" + (r.credit ? " · " + r.credit + "학점" : "");
+          tk.appendChild(d);
+        });
+      });
+      if(v != null){
+        var m = el("i", "avg");
+        m.style.left = gradePos(v);
+        m.title = "학점 가중 평균 " + v.toFixed(2) + "등급";
+        tk.appendChild(m);
+      }
+      row.appendChild(tk);
+      row.appendChild(el("div", "vv", fmt(v)));
+      sec.appendChild(row);
+    });
+    return sec;
+  }
+
+  /* 학기별 추이 — 계열별 학점 가중 평균 등급을 학기마다 이은 선. 학기가 둘 이상일 때만 그립니다.
+     세로축은 학생의 실제 범위에 맞춰 늘려서, 0.2등급 차이도 기울기로 보이게 합니다. */
+  function termTrend(rows){
+    var ranked = rows.filter(function(r){ return r.rank && r.g; });
+    var terms = termsOf(ranked);
+    if(terms.length < 2) return null;
+
+    var series = [{label:"전체", color:"var(--ink)", rows:ranked, all:true}];
+    GROUPS.forEach(function(gp){
+      var rs = rowsOfGroup(ranked, gp.id);
+      if(rs.length) series.push({label:gp.label, color:gp.color, rows:rs});
+    });
+    var lo = 5, hi = 1;
+    series.forEach(function(s){
+      s.pts = terms.map(function(k){
+        var v = wAvgRank(s.rows.filter(function(r){ return termKey(r) === k; }));
+        if(v != null){ lo = Math.min(lo, v); hi = Math.max(hi, v); }
+        return v;
+      });
+      s.has = s.pts.filter(function(v){ return v != null; });
+    });
+    series = series.filter(function(s){ return s.has.length; });
+    if(!series.length) return null;
+    lo = Math.floor(lo); hi = Math.ceil(hi);
+    if(hi === lo){ if(hi < 5) hi++; else lo--; }
+    var step = (hi - lo) <= 2 ? 0.5 : 1;
+
+    var sec = el("section");
+    var h = el("div", "sec-head");
+    h.appendChild(el("h2", null, "학기별 추이"));
+    h.appendChild(el("span", "sec-note", "위쪽이 1등급 · 학점 가중 평균"));
+    sec.appendChild(h);
+
+    var lg = el("div", "tlegend");
+    series.forEach(function(s){
+      var it = el("span", s.all ? "all" : null);
+      it.style.setProperty("--tc", s.color);
+      it.appendChild(el("i"));
+      var first = s.has[0], last = s.has[s.has.length - 1];
+      it.appendChild(document.createTextNode(s.label + " " + first.toFixed(2) + (s.has.length > 1 ? " → " + last.toFixed(2) : "")));
+      lg.appendChild(it);
+    });
+    sec.appendChild(lg);
+
+    // 가로·세로 모두 % 좌표라 화면 폭이 바뀌어도 글자 크기는 그대로입니다
+    var X = function(i){ return (4 + i / (terms.length - 1) * 92) + "%"; };
+    var Y = function(v){ return (6 + (v - lo) / (hi - lo) * 88) + "%"; };
+    var wrap = el("div", "trend");
+    var yl = el("div", "ylab");
+    var plot = el("div", "plot");
+    var svg = svgEl("svg", {width:"100%", height:"100%"});
+    for(var g = lo; g <= hi + 1e-9; g += step){
+      svg.appendChild(svgEl("line", {x1:"0", x2:"100%", y1:Y(g), y2:Y(g), "class":"hl"}));
+      var t = el("span", null, g % 1 ? g.toFixed(1) : g + "등급");
+      t.style.top = Y(g);
+      yl.appendChild(t);
+    }
+    series.forEach(function(s){
+      var prev = -1;
+      s.pts.forEach(function(v, i){
+        if(v == null) return;
+        if(prev >= 0){
+          svg.appendChild(svgEl("line", {x1:X(prev), y1:Y(s.pts[prev]), x2:X(i), y2:Y(v),
+            "class":"ln" + (s.all ? " all" : ""), style:"stroke:" + s.color}));
+        }
+        prev = i;
+      });
+    });
+    series.forEach(function(s){
+      s.pts.forEach(function(v, i){
+        if(v == null) return;
+        var c = svgEl("circle", {cx:X(i), cy:Y(v), r:s.all ? 3 : 4, "class":"pt", style:"fill:" + s.color});
+        var tt = svgEl("title");
+        tt.textContent = s.label + " " + termLabel(terms[i]) + " · " + v.toFixed(2) + "등급";
+        c.appendChild(tt);
+        svg.appendChild(c);
+      });
+    });
+    plot.appendChild(svg);
+    wrap.appendChild(yl);
+    wrap.appendChild(plot);
+    sec.appendChild(wrap);
+
+    var xl = el("div", "xlab");
+    terms.forEach(function(k, i){
+      var p = k.split("-");
+      var t = el("span", null, (p[1] && p[1] !== "null" && p[1] !== "undefined") ? p[0] + "-" + p[1] : p[0] + "학년");
+      t.style.left = X(i);
+      xl.appendChild(t);
+    });
+    sec.appendChild(xl);
+    return sec;
+  }
+
   /* ---------------- 성적 요약 ---------------- */
   function renderScore(box, no){
     var rows = rowsOf(no);
@@ -1071,27 +1272,9 @@ window.IPGYEOL = {"builtin-yonsei-chucheon":[{"year":2025,"track":"학생부교�
     tiles.appendChild(tile("이수 학점", String(sumCredit(rows)), "등급 과목 " + sumCredit(ranked) + "학점"));
     box.appendChild(tiles);
 
-    var areaSec = el("section");
-    var ah = el("div", "sec-head");
-    ah.appendChild(el("h2", null, "교과별 평균 등급"));
-    ah.appendChild(el("span", "sec-note", "낮을수록 김"));
-    areaSec.appendChild(ah);
-    ALL_AREAS.forEach(function(a){
-      var rs = rows.filter(function(r){ return r.area === a && r.rank; });
-      if(!rs.length) return;
-      var v = wAvgRank(rs);
-      var row = el("div", "barrow");
-      row.style.setProperty("--tc", (GROUPS.filter(function(g){ return g.id === groupOf(a); })[0] || GROUPS[3]).color);
-      row.appendChild(el("div", "lb", a.replace("(역사/도덕포함)", "").replace("기술·가정/정보", "기가·정보").replace("제2외국어/한문", "제2외/한문")));
-      var bar = el("div", "bar");
-      var fill = el("i");
-      fill.style.width = Math.max(3, (5 - v) / 4 * 100) + "%";
-      bar.appendChild(fill);
-      row.appendChild(bar);
-      row.appendChild(el("div", "vv", v.toFixed(2)));
-      areaSec.appendChild(row);
-    });
-    box.appendChild(areaSec);
+    box.appendChild(areaScale(rows));
+    var trend = termTrend(rows);
+    if(trend) box.appendChild(trend);
 
     var seg = el("div", "seg");
     [["area", "계열별"], ["term", "학기별"]].forEach(function(p){
