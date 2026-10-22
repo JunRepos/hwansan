@@ -1,0 +1,113 @@
+// Run against a local static server: NODE_PATH=<playwright packages> node tools/test-counseling-browser.cjs
+const {chromium}=require('playwright');
+const assert=require('assert/strict'),fs=require('fs'),os=require('os'),path=require('path');
+(async()=>{
+ const output=process.env.HWANSAN_QA_DIR||path.join(os.tmpdir(),'hwansan-qa');fs.mkdirSync(output,{recursive:true});
+ const browser=await chromium.launch({headless:true,channel:'chrome',downloadsPath:output});
+ const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.HWANSAN_TEST_URL||require('url').pathToFileURL(path.resolve(__dirname,'../상담.html')).href);
+ await page.getByRole('button',{name:'예시 성적 보기'}).click();
+ assert.equal(await page.locator('#grade-breakdown tbody tr').count(),20);
+ assert.equal(await page.locator('#grade-breakdown .grade-group').count(),3);
+ assert.equal(await page.locator('#grade-breakdown .achievement-heading').count(),1);
+ await page.locator('[data-score-mode="term"]').click();
+ assert.equal(await page.locator('#grade-breakdown tbody tr').count(),20);
+ assert.equal(await page.locator('#grade-breakdown .grade-group').count(),3);
+ assert.ok((await page.locator('#grade-breakdown h2').allTextContents()).includes('2학년 1학기'));
+ await page.locator('[data-score-mode="area"]').click();
+ assert.equal(await page.locator('.gscale:not(.head)').count(),5); assert.equal(await page.locator('.trend svg').count(),1); assert.equal(await page.locator('.tlegend span').count(),4); await page.locator('#toast').evaluate(e=>e.hidden=true); await page.screenshot({path:path.join(output,'hwansan-overview.png'),fullPage:true});
+ await page.getByRole('button',{name:'대학 환산'}).click();
+ // Exercise browser IME composition, not just filling a completed Korean string.
+ const ime=await page.context().newCDPSession(page);
+ await page.locator('#query').focus();await page.evaluate(()=>{window.__searchInput=document.getElementById('query')});
+ for(const syllable of [['ㄷ','도','동'],['ㄱ','구','국'],['ㄷ','대']]){
+   for(const text of syllable)await ime.send('Input.imeSetComposition',{text,selectionStart:text.length,selectionEnd:text.length});
+   await ime.send('Input.insertText',{text:syllable.at(-1)});
+ }
+ assert.equal(await page.locator('#query').inputValue(),'동국대');
+ assert.equal(await page.locator('[data-select]').count(),1);
+ assert.equal(await page.locator('[data-select]').getAttribute('data-select'),'s-dongguk:0');
+ assert.ok(await page.evaluate(()=>document.getElementById('query')===window.__searchInput&&document.activeElement===window.__searchInput));
+ await page.locator('#query').fill('');assert.equal(await page.locator('[data-select]').count(),70);
+ await ime.detach();
+ assert.equal(await page.locator('#detail-panel').count(),0); await page.locator('#query').fill('서울과기');
+ assert.equal(await page.locator('[data-select]').count(),3);
+ await page.locator('[data-select="s-seoultech:1"]').click();
+ assert.equal(await page.locator('#detail-panel').count(),1);
+ const conversion=await page.evaluate(()=>Counsel.conversion(2));
+ assert.ok(conversion&&Number.isFinite(conversion.lo));
+ assert.equal(await page.locator('#nine-grade-mid').textContent(),((conversion.lo+conversion.hi)/2).toFixed(2));
+ assert.ok((await page.locator('#nine-grade-range').textContent()).includes(conversion.lo.toFixed(2)));
+ assert.ok((await page.locator('#ip-table thead').innerText()).includes('50%컷 대비'));
+ await page.locator('#ip-benchmark').selectOption('1');assert.ok((await page.locator('#ip-table thead').innerText()).includes('50%컷 대비'));
+ await page.locator('#ip-benchmark').selectOption('3');assert.ok((await page.locator('#ip-table thead').innerText()).includes('평균 대비'));
+ await page.locator('#ip-benchmark').selectOption('2');
+ const cutCheck=await page.locator('#ip-table tbody tr').first().evaluate(tr=>({cut:tr.cells[2].textContent,result:tr.cells[4].textContent}));
+ if(cutCheck.cut==='—')assert.equal(cutCheck.result,'입결 미공개');else assert.match(cutCheck.result,/등급|동일/);
+ assert.equal(await page.locator('[data-university-row="s-seoultech:1"] + .university-expanded #detail-panel').count(),1);
+ await page.locator('[data-detail-tab="subjects"]').click();assert.ok(await page.locator('#detail-subjects').isVisible());assert.ok(!(await page.locator('#detail-results').isVisible()));
+ await page.locator('[data-detail-tab="results"]').click();assert.ok(await page.locator('#detail-results').isVisible());
+ await page.locator('[data-select="s-seoultech:0"]').click();assert.equal(await page.locator('.university-expanded').count(),1);
+ await page.locator('[data-select="s-seoultech:0"]').click();assert.equal(await page.locator('#detail-panel').count(),0);
+ await page.locator('[data-university-row="s-seoultech:1"] td.numcell').first().click();
+ assert.equal(await page.locator('#detail-panel').count(),1);
+ await page.locator('#toast').evaluate(e=>e.hidden=true);
+ await page.locator('[data-university-row="s-seoultech:1"]').scrollIntoViewIfNeeded();
+ await page.screenshot({path:path.join(output,'hwansan-university-inline.png'),fullPage:false});
+ await page.locator('button[data-plan="s-seoultech:1"]').click();
+ await page.locator('[data-edit="rank"][data-index="0"]').selectOption('1');
+ await page.locator('#target-value').fill('990');
+ await page.locator('#target-value').blur();
+ await page.getByText('성적 조합 비교',{exact:true}).click(); await page.getByRole('button',{name:'성적 조합 비교하기'}).click();
+ assert.ok((await page.locator('#scenarios').textContent()).includes('현재 계획'));
+ await page.screenshot({path:path.join(output,'hwansan-plan.png'),fullPage:true});
+ await page.locator('#save-toggle').click();
+ await page.reload();
+ assert.equal(await page.locator('#student option').count(),1);
+ // Also inspect the generated Blob so download permission failures are distinct from export correctness.
+ await page.evaluate(()=>{const original=URL.createObjectURL;URL.createObjectURL=function(blob){window.__exportBlob=blob;return original.call(URL,blob)}});
+ const dl=page.waitForEvent('download');await page.locator('#backup').click();const backup=await dl;
+ const file=path.join(output,'hwansan-test-backup.json');
+ try{await backup.saveAs(file)}catch(e){console.log('LIMIT: native download canceled by this browser environment; validating generated export Blob and restore instead.');const text=await page.evaluate(()=>window.__exportBlob.text());fs.writeFileSync(file,text)}
+ const saved=JSON.parse(fs.readFileSync(file));assert.equal(saved.version,1);assert.equal(saved.students[0].plan[0].rank,1);
+ // The reported defect: missing fields in excluded math/lab rows must not block MTU.
+ const mtu=JSON.parse(JSON.stringify(saved));mtu.students[0].rows.forEach(r=>{if(r.area==='수학'||r.subject.startsWith('과학탐구실험')){r.score=null;r.count=null}});
+ await page.locator('#file').setInputFiles({name:'mtu-exclusions.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(mtu))});await page.locator('#apply-import').click();
+ await page.locator('.nav [data-page="compare"]').click();await page.locator('#query').fill('감리교');
+ assert.equal(await page.locator('[data-select]').count(),1);
+ assert.ok(!(await page.locator('#view').innerText()).includes('계산 불가'));
+ await page.locator('[data-select="s-mtheo:0"]').click();assert.equal(await page.locator('#detail-panel .notice.error').count(),0);
+ mtu.students[0].rows.find(r=>r.area==='국어').score=null;
+ await page.locator('#file').setInputFiles({name:'mtu-missing.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(mtu))});await page.locator('#apply-import').click();
+ await page.locator('.nav [data-page="compare"]').click();
+ assert.ok((await page.locator('#view').innerText()).includes('공통국어1: 원점수'));
+ const csv='번호,성명,학년,학기,교과,과목,학점,원점수/평균,성취도,성취도별 분포비율,석차등급,수강자수,비고\n1,테스트학생,1,1,국어,공통국어1,4,90/70,A,A(30),2,100,\n';
+ await page.locator('#file').setInputFiles({name:'synthetic.csv',mimeType:'text/csv',buffer:Buffer.from(csv)});
+ await page.locator('#apply-import').click();
+ assert.ok((await page.locator('#student option').textContent()).includes('테스트학생'));
+ await page.getByRole('button',{name:'성적 입력·수정'}).click();
+ assert.equal(await page.locator('[data-edit="subject"]').inputValue(),'공통국어1');
+ // Exercise the real embedded XLSX reader with a generated, entirely synthetic workbook.
+ const xlsx=await page.evaluate(()=>{const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['안내문']]),'안내');XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['번호','성명','학년','학기','교과','과목','학점','원점수/평균','성취도','분포','석차등급','수강자수'],[1,'엑셀가상학생',1,1,'수학','공통수학1',4,'90/70','A','A(30)',2,100]]),'성적');return XLSX.write(w,{bookType:'xlsx',type:'base64'})});
+ await page.locator('#file').setInputFiles({name:'synthetic.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:Buffer.from(xlsx,'base64')});
+ await page.locator('#apply-import').click();assert.ok((await page.locator('#student option').textContent()).includes('엑셀가상학생'));
+ // Restore backup, then ensure simulated input cannot execute HTML.
+ await page.locator('#file').setInputFiles(file);await page.locator('#apply-import').click();
+ await page.getByRole('button',{name:'성적 입력·수정'}).click();
+ await page.locator('[data-edit="subject"]').first().fill('<img src=x onerror=alert(1)>');
+ await page.locator('[data-edit="subject"]').first().blur();
+ assert.equal(await page.locator('#view img').count(),0);
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('#file').setInputFiles(file);await page.locator('#apply-import').click();
+ await page.screenshot({path:path.join(output,'hwansan-mobile.png'),fullPage:true});
+ const sizes=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+ assert.ok(sizes.scroll<=sizes.width+1,JSON.stringify(sizes));
+ await page.locator('.nav [data-page="plan"]').click();
+ await page.screenshot({path:path.join(output,'hwansan-mobile-plan.png'),fullPage:true});
+ await page.emulateMedia({media:'print'});await page.pdf({path:path.join(output,'hwansan-print.pdf'),format:'A4',printBackground:true});
+ assert.deepEqual(errors,[]);
+ console.log('PASS browser: demo, search, plan, targets, scenarios, local storage, backup content/restore, CSV, actual XLSX reading, escaping, mobile width, print; no page errors');
+ console.log('Screenshots:',output);
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

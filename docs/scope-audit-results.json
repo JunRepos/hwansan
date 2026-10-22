@@ -1,0 +1,426 @@
+{
+  "variants": 70,
+  "exclusionChecks": 423,
+  "report": [
+    {
+      "key": "s-catholic:0",
+      "label": "가톨릭대(성의교정) · 지역균형전형 · 간호학과",
+      "exclusionChecks": 5,
+      "status": "교과성적(평균×반영비율 0.9, 만점 표기 없음)"
+    },
+    {
+      "key": "s-mtheo:0",
+      "label": "감리교신학대 · 일반전형",
+      "exclusionChecks": 7,
+      "status": "반영 과목 원점수 평균(환산식 미공개)"
+    },
+    {
+      "key": "s-kangseo-gw:0",
+      "label": "강서대 · 교과우수자전형 / 인문사회",
+      "exclusionChecks": 6,
+      "status": "과목 평균 반영점수(1,000점 척도)"
+    },
+    {
+      "key": "s-kangseo-gw:1",
+      "label": "강서대 · 교과우수자전형 / 식품영양학과",
+      "exclusionChecks": 6,
+      "status": "과목 평균 반영점수(1,000점 척도)"
+    },
+    {
+      "key": "s-kangseo-il:0",
+      "label": "강서대 · 일반학생전형 / 인문사회",
+      "exclusionChecks": 6,
+      "status": "과목 평균 반영점수(1,000점 척도)"
+    },
+    {
+      "key": "s-kangseo-il:1",
+      "label": "강서대 · 일반학생전형 / 식품영양학과",
+      "exclusionChecks": 6,
+      "status": "과목 평균 반영점수(1,000점 척도)"
+    },
+    {
+      "key": "s-kangseo-il:2",
+      "label": "강서대 · 일반학생전형 / 간호학과",
+      "exclusionChecks": 6,
+      "status": "과목 평균 반영점수(1,000점 척도)"
+    },
+    {
+      "key": "s-konkuk:0",
+      "label": "건국대 · KU지역균형",
+      "exclusionChecks": 7,
+      "status": "등급 기준점수표 미공개"
+    },
+    {
+      "key": "s-kyonggi-gw:0",
+      "label": "경기대(서울) · 교과성적우수자전형",
+      "exclusionChecks": 8,
+      "status": "평균점수(100점 만점)"
+    },
+    {
+      "key": "s-kyonggi-hs:0",
+      "label": "경기대(서울) · 학교장추천전형",
+      "exclusionChecks": 4,
+      "status": "평균점수(100점 만점)"
+    },
+    {
+      "key": "s-khu:0",
+      "label": "경희대(서울) · 지역균형전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "석차등급 점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-khu:1",
+      "label": "경희대(서울) · 지역균형전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "석차등급 점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-khu:2",
+      "label": "경희대(서울) · 지역균형전형 / 자율·자유전공학부",
+      "exclusionChecks": 6,
+      "status": "석차등급 점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-korea:0",
+      "label": "고려대 · 학교추천전형",
+      "exclusionChecks": 4,
+      "status": "교과 반영점수(80점 만점)"
+    },
+    {
+      "key": "s-kwangwoon:0",
+      "label": "광운대 · 지역균형전형",
+      "exclusionChecks": 7,
+      "status": "점수표 미공개"
+    },
+    {
+      "key": "s-kookmin:0",
+      "label": "국민대 · 교과우수자(학교장추천)전형Ⅰ / 인문",
+      "exclusionChecks": 8,
+      "status": "교과점수(1,000점 기준 · 그룹별 가중)"
+    },
+    {
+      "key": "s-kookmin:1",
+      "label": "국민대 · 교과우수자(학교장추천)전형Ⅰ / 자연",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점 기준 · 그룹별 가중)"
+    },
+    {
+      "key": "s-duksung:0",
+      "label": "덕성여대 · 고교추천전형",
+      "exclusionChecks": 7,
+      "status": "교과 평균점수(100점 기준)"
+    },
+    {
+      "key": "s-dongguk:0",
+      "label": "동국대 · 학교장추천인재",
+      "exclusionChecks": 6,
+      "status": "상위 10과목 영역점수 합(100점 만점, 700점 환산식 원문에 없음)"
+    },
+    {
+      "key": "s-dongduk:0",
+      "label": "동덕여대 · 학생부교과우수자 특별전형",
+      "exclusionChecks": 6,
+      "status": "교과점수(1,000점 만점)"
+    },
+    {
+      "key": "s-dongduk:1",
+      "label": "동덕여대 · 학생부교과우수자 특별전형 / 약학과",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점 만점)"
+    },
+    {
+      "key": "s-myongji-iv:0",
+      "label": "명지대(인문캠퍼스) · 교과면접전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "교과점수(900점 기준, 가산점 포함)"
+    },
+    {
+      "key": "s-myongji-iv:1",
+      "label": "명지대(인문캠퍼스) · 교과면접전형 / 자연",
+      "exclusionChecks": 6,
+      "status": "교과점수(900점 기준, 가산점 포함)"
+    },
+    {
+      "key": "s-myongji-hs:0",
+      "label": "명지대(인문캠퍼스) · 학교장추천전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "교과점수(900점 기준, 가산점 포함)"
+    },
+    {
+      "key": "s-myongji-hs:1",
+      "label": "명지대(인문캠퍼스) · 학교장추천전형 / 자연",
+      "exclusionChecks": 6,
+      "status": "교과점수(900점 기준, 가산점 포함)"
+    },
+    {
+      "key": "s-sahmyook:0",
+      "label": "삼육대 · 학교장추천전형",
+      "exclusionChecks": 6,
+      "status": "학생부 점수(100점 기준)"
+    },
+    {
+      "key": "s-sangmyung:0",
+      "label": "상명대(서울) · 고교추천전형",
+      "exclusionChecks": 4,
+      "status": "교과성적(평균×반영비율 0.95, 만점 표기 없음)"
+    },
+    {
+      "key": "s-sogang:0",
+      "label": "서강대 · 학생부교과(지역균형)",
+      "exclusionChecks": 3,
+      "status": "교과점수(900점 만점)"
+    },
+    {
+      "key": "s-seokyeong-math:0",
+      "label": "서경대 · 교과우수자(수리위주)",
+      "exclusionChecks": 6,
+      "status": "교과 환산(100점 기준, ×반영배점 전)"
+    },
+    {
+      "key": "s-seokyeong-lang:0",
+      "label": "서경대 · 교과우수자(언어위주)",
+      "exclusionChecks": 6,
+      "status": "교과 환산(100점 기준, ×반영배점 전)"
+    },
+    {
+      "key": "s-seokyeong-fu:0",
+      "label": "서경대 · 미래인재",
+      "exclusionChecks": 6,
+      "status": "교과 환산(100점 기준, ×반영배점 전)"
+    },
+    {
+      "key": "s-seoultech:0",
+      "label": "서울과기대 · 고교추천전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점 만점)"
+    },
+    {
+      "key": "s-seoultech:1",
+      "label": "서울과기대 · 고교추천전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점 만점)"
+    },
+    {
+      "key": "s-seoultech:2",
+      "label": "서울과기대 · 고교추천전형 / ST자유전공·건축학",
+      "exclusionChecks": 6,
+      "status": "교과점수(1,000점 만점)"
+    },
+    {
+      "key": "s-snue:0",
+      "label": "서울교대 · 학교장추천전형",
+      "exclusionChecks": 1,
+      "status": "점수표·산출식 원문에 없음"
+    },
+    {
+      "key": "s-scu:0",
+      "label": "서울기독대 · 일반전형",
+      "exclusionChecks": 4,
+      "status": "학년별 평균 반영점수(3학년 없어 합산 불가)"
+    },
+    {
+      "key": "s-scu:1",
+      "label": "서울기독대 · 일반전형 / 사회복지·글로벌휴먼경영(400점 표)",
+      "exclusionChecks": 4,
+      "status": "학년별 평균 반영점수(3학년 없어 합산 불가)"
+    },
+    {
+      "key": "s-uos:0",
+      "label": "서울시립대 · 지역균형선발전형",
+      "exclusionChecks": 4,
+      "status": "산출식·점수표 원문에 없음"
+    },
+    {
+      "key": "s-swu:0",
+      "label": "서울여대 · 교과우수자전형",
+      "exclusionChecks": 6,
+      "status": "교과점수(90점 만점)"
+    },
+    {
+      "key": "s-hanyoung:0",
+      "label": "서울한영대 · 일반전형",
+      "exclusionChecks": 9,
+      "status": "등급점수표·교과군 가중치 원문에 없음"
+    },
+    {
+      "key": "s-skhu:0",
+      "label": "성공회대 · 교과성적전형",
+      "exclusionChecks": 6,
+      "status": "교과점수(600점 만점)"
+    },
+    {
+      "key": "s-skku:0",
+      "label": "성균관대 · 추천인재",
+      "exclusionChecks": 4,
+      "status": "정량점수(700점, 정성 30% 제외)"
+    },
+    {
+      "key": "s-sungshin:0",
+      "label": "성신여대 · 지역균형Ⅰ전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "교과성적(90점 만점)"
+    },
+    {
+      "key": "s-sungshin:1",
+      "label": "성신여대 · 지역균형Ⅰ전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "교과성적(90점 만점)"
+    },
+    {
+      "key": "s-sungshin:2",
+      "label": "성신여대 · 지역균형Ⅰ전형 / 창의융합학부(자유전공)",
+      "exclusionChecks": 6,
+      "status": "교과성적(90점 만점)"
+    },
+    {
+      "key": "s-sejong:0",
+      "label": "세종대 · 지역균형전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-sejong:1",
+      "label": "세종대 · 지역균형전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-sejong:2",
+      "label": "세종대 · 지역균형전형 / 자유전공학부",
+      "exclusionChecks": 6,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-sookmyung:0",
+      "label": "숙명여대 · 지역균형선발전형",
+      "exclusionChecks": 7,
+      "status": "점수표 미공개(공통·일반 석차 70%+성취도 30%)"
+    },
+    {
+      "key": "s-soongsil:0",
+      "label": "숭실대 · 교과우수자전형 / 인문",
+      "exclusionChecks": 8,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-soongsil:1",
+      "label": "숭실대 · 교과우수자전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-soongsil:2",
+      "label": "숭실대 · 교과우수자전형 / 경상계열",
+      "exclusionChecks": 8,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-soongsil:3",
+      "label": "숭실대 · 교과우수자전형 / 자유전공학부(인문)",
+      "exclusionChecks": 8,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-yonsei:0",
+      "label": "연세대 · 학생부교과[추천형]",
+      "exclusionChecks": 1,
+      "status": "반영과목A 점수(100점, 감점 전)"
+    },
+    {
+      "key": "s-ewha:0",
+      "label": "이화여대 · 고교추천전형",
+      "exclusionChecks": 6,
+      "status": "석차등급 점수 평균(10점 만점, 800점 환산 전)"
+    },
+    {
+      "key": "s-pcts:0",
+      "label": "장로회신학대 · 학생부우수자",
+      "exclusionChecks": 6,
+      "status": "석차 80%·성취도 20% 결합 방법 원문에 없음"
+    },
+    {
+      "key": "s-cau:0",
+      "label": "중앙대 · 지역균형",
+      "exclusionChecks": 4,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-chongshin:0",
+      "label": "총신대 · 교과우수자",
+      "exclusionChecks": 6,
+      "status": "점수표·감점표 원문에 없음"
+    },
+    {
+      "key": "s-chugye:0",
+      "label": "추계예대 · 미래인재전형",
+      "exclusionChecks": 8,
+      "status": "교과점수(100점 척도)"
+    },
+    {
+      "key": "s-bible:0",
+      "label": "한국성서대 · 일반학생전형",
+      "exclusionChecks": 6,
+      "status": "평균→점수 변환식 원문에 없음"
+    },
+    {
+      "key": "s-bible:1",
+      "label": "한국성서대 · 일반학생전형 / 간호학과",
+      "exclusionChecks": 6,
+      "status": "평균→점수 변환식 원문에 없음"
+    },
+    {
+      "key": "s-hufs:0",
+      "label": "한국외대 · 학교장추천전형",
+      "exclusionChecks": 6,
+      "status": "등급환산점수표 미공개"
+    },
+    {
+      "key": "s-knsu:0",
+      "label": "한국체대 · 교과성적우수자전형",
+      "exclusionChecks": 1,
+      "status": "산출식 원문에 없음(학년 30:30:40)"
+    },
+    {
+      "key": "s-hansung-gw:0",
+      "label": "한성대 · 교과우수전형 / 인문(국영수사)",
+      "exclusionChecks": 8,
+      "status": "교과점수(1,000점, 학점가중 가정)"
+    },
+    {
+      "key": "s-hansung-gw:1",
+      "label": "한성대 · 교과우수전형 / 자연(국영수과)",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점, 학점가중 가정)"
+    },
+    {
+      "key": "s-hansung-gw:2",
+      "label": "한성대 · 교과우수전형 / 상상력인재학부",
+      "exclusionChecks": 5,
+      "status": "교과점수(1,000점, 학점가중 가정)"
+    },
+    {
+      "key": "s-hansung-jy:0",
+      "label": "한성대 · 지역균형전형",
+      "exclusionChecks": 7,
+      "status": "교과점수(1,000점, 학점가중 가정)"
+    },
+    {
+      "key": "s-hanyang:0",
+      "label": "한양대 · 학생부교과(추천형)",
+      "exclusionChecks": 6,
+      "status": "환산점수표 미공개(모집요강 공지 예정)"
+    },
+    {
+      "key": "s-hongik:0",
+      "label": "홍익대(서울) · 학교장추천자전형 / 인문",
+      "exclusionChecks": 7,
+      "status": "석차등급 환산표 미공개(모집요강 공개 예정)"
+    },
+    {
+      "key": "s-hongik:1",
+      "label": "홍익대(서울) · 학교장추천자전형 / 자연",
+      "exclusionChecks": 7,
+      "status": "석차등급 환산표 미공개(모집요강 공개 예정)"
+    }
+  ]
+}
