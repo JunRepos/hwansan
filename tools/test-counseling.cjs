@@ -81,4 +81,11 @@ test('nine-grade reference comparison preserves range, direction and absent cuto
  for(const cut of [null,undefined,'',0,10])assert.equal(C.gradeComparison(1,cut).difference,null);
  for(const g of [null,undefined,0,6])assert.equal(C.gradeComparison(g,2),null);
 });
+test('2028 CSAT minimums cover every entry with one default rule at most',()=>{
+ const S=context.CSAT2028;assert.ok(S,'CSAT2028 missing');
+ assert.equal(JSON.stringify(Object.keys(S).sort()),JSON.stringify(context.SEOUL.list.map(e=>e.id).sort()));
+ for(const [id,x] of Object.entries(S)){assert.ok(x.rules.length,id);assert.ok(x.verified,id+' not checked against the plan');
+  x.rules.forEach(r=>{assert.ok(r.text&&r.scope,id);assert.ok(r.units===null||(Array.isArray(r.units)&&r.units.length),id)});
+  assert.ok(x.rules.filter(r=>!r.units).length<=1,id);x.units.forEach(u=>assert.equal(u.length,2,id));}
+});
 console.log(`${tests} checks passed (${C.variants.length} variants)`);

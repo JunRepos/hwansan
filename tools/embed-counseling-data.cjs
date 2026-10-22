@@ -49,6 +49,11 @@ if(startCalc<0||endCalc<0)throw Error('Calculation block missing');
 output=output.slice(0,startCalc)+'/* CANDIDATE_SCOPE_START */\n'+scope+'\n'+calculate+'\n/* CANDIDATE_SCOPE_END */\n '+output.slice(endCalc);
 output=output.replace('return {kinds,areas,catalog,identify,num,avg,term,issues,variants,calculate,','return {kinds,areas,catalog,identify,num,avg,term,issues,variants,scopeExclusion,calculate,');
 output=output.replace('variants,scopeExclusion,calculate,conversion,','variants,scopeExclusion,calculate,gradeComparison,conversion,');
+// 2028 수능 최저학력기준(tools/csat-2028.js)은 공개 규칙 바로 뒤에 둔다.
+const csat=fs.readFileSync(path.join(__dirname,'csat-2028.js'),'utf8');
+const csatBlock='<!-- CSAT_DATA_START -->\n<script id="csat-data">'+csat+'</script>\n<!-- CSAT_DATA_END -->';
+output=output.includes('<!-- CSAT_DATA_START -->')?output.replace(/<!-- CSAT_DATA_START -->[\s\S]*?<!-- CSAT_DATA_END -->/,()=>csatBlock):output.replace('<!-- PUBLIC_DATA_END -->',()=>'<!-- PUBLIC_DATA_END -->\n'+csatBlock);
+if(!output.includes('<script id="csat-data">'))throw Error('CSAT block missing');
 if(output === html && !html.includes('PUBLIC_DATA_START')) throw Error('Data marker missing');
 fs.writeFileSync(target,output);
-console.log('Embedded current rules and conversion table into 상담.html');
+console.log('Embedded current rules, conversion table and 2028 CSAT minimums into 상담.html');
