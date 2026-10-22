@@ -1,0 +1,11 @@
+function gradeBreakdown(rows){
+ const mode=state.scoreMode||'area';
+ const credit=rs=>rs.reduce((sum,r)=>sum+(Number(r.credit)||0),0);
+ const value=n=>n==null?'—':esc(n);
+ const table=(rs,byTerm)=>`<div class="table-wrap"><table class="grade-detail-table"><thead><tr><th scope="col">과목</th><th scope="col">학점</th><th scope="col">원점수/평균</th><th scope="col">성취도</th><th scope="col">등급</th><th scope="col">수강자수</th></tr></thead><tbody>${rs.map(r=>`<tr><td><strong>${esc(r.subject)}</strong><small>${esc(byTerm?r.area:termLabel(termKey(r)))}</small></td><td>${value(r.credit)}</td><td>${r.score==null&&r.avg==null?'—':value(r.score)+' / '+value(r.avg)}</td><td>${r.ach?`<span class="achievement ${'ABCDE'.includes(r.ach)&&r.ach.length===1?r.ach:'other'}">${esc(r.ach)}</span>`:'—'}</td><td><b>${value(r.rank)}</b></td><td>${value(r.count)}</td></tr>`).join('')}</tbody></table></div>`;
+ const groups=mode==='term'?termsOf(rows).map(k=>({label:termLabel(k),rows:rows.filter(r=>termKey(r)===k),color:'var(--ink)'})):GROUPS.map(g=>({label:g.label,rows:rowsOfGroup(rows,g.id),color:g.color}));
+ return `<div id="grade-breakdown"><div class="grade-view-switch noprint" role="group" aria-label="과목 성적 보기 기준"><button data-score-mode="area" aria-pressed="${mode==='area'}">교과(군)별</button><button data-score-mode="term" aria-pressed="${mode==='term'}">학기별</button></div>${groups.filter(g=>g.rows.length).map(g=>{
+ const rs=g.rows.slice().sort(byTerm),ranked=rs.filter(r=>r.rank!=null),achievement=rs.filter(r=>r.rank==null),average=C.avg(rs);
+ return `<section class="panel grade-group"><div class="panel-head"><h2 style="color:${g.color}">${esc(g.label)}</h2><span class="sec-note">${average==null?'평균등급 없음':'평균 '+fmt(average)+'등급'} · ${rs.length}과목 ${credit(rs)}학점</span></div>${mode==='area'?`<p class="help-line">${[...new Set(rs.map(r=>r.area))].map(esc).join(' · ')}</p>`:''}${ranked.length?table(ranked,mode==='term'):''}${achievement.length?`<div class="panel-head achievement-heading"><h3>성취도만 있는 과목</h3><span class="sec-note">${achievement.length}과목 ${credit(achievement)}학점</span></div>${table(achievement,mode==='term')}`:''}</section>`;
+ }).join('')||'<section class="empty">입력된 과목이 없습니다.</section>'}<p class="help-line">평균등급은 석차등급이 있는 과목의 학점 가중 평균입니다. 성취도만 있는 과목은 평균등급에서 제외합니다.</p></div>`;
+}
