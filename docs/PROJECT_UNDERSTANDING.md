@@ -4,7 +4,7 @@
 
 > **지난 기록입니다(2026-10-22).** 이 문서는 커밋 `4cfb667` 시점의 분석이다. 그 뒤로 많은 것이 바뀌었다.
 >
-> - `index.html`은 서울 학생부교과 47개 전형(70개 산출 기준), 5→9등급 환산(부산광역시교육청 변환표), 5/9등급 전환을 갖췄다.
+> - `환산기.html`(옛 `index.html`)은 서울 학생부교과 47개 전형(70개 산출 기준), 5→9등급 환산(부산광역시교육청 변환표), 5/9등급 전환을 갖췄다.
 > - 상담용 `상담.html`과 빌드·검사 도구(`tools/`)가 추가되었다.
 >
 > 지금 구조는 README의 ‘상담용 화면’ 절과 `SUBJECT_CATALOG.md`, `CALCULATION_SCOPE_AUDIT.md`를 본다.
@@ -24,7 +24,7 @@
 
 | 파일/구성 | 역할 |
 |---|---|
-| `index.html` | HTML·CSS·JavaScript·대학 환산 규칙·입결 데이터 전체 |
+| `환산기.html` (옛 `index.html`) | HTML·CSS·JavaScript·대학 환산 규칙·입결 데이터 전체 |
 | `README.md` | 사용자 안내, 배포 주소, 대학 추가 방법 |
 | `LICENSE` | MIT |
 | `.gitignore` | xlsx/xls/csv/pdf 등 자료 제외 |

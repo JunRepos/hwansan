@@ -59,4 +59,4 @@
 
 대학 홈페이지 검색에서 2028 자료 탐색은 진행했으나, 검색된 과거 연도 문서로 2028 규칙을 덮어쓰지 않았다. 따라서 이 수정은 “모든 대학 공식 규칙 검증 완료” 또는 “상담 결과 무오류 보증”이 아니다.
 
-빌드: tools/embed-counseling-data.cjs는 원본 index.html의 규칙과 tools/counseling-scope.js, tools/counseling-calculate.js를 결합한다. 원본 index.html은 수정하지 않았다.
+빌드: tools/embed-counseling-data.cjs는 원본 환산기.html(옛 index.html)의 규칙과 tools/counseling-scope.js, tools/counseling-calculate.js를 결합한다. 원본 환산기.html은 수정하지 않았다.
