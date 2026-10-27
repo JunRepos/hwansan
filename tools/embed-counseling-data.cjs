@@ -1,9 +1,9 @@
 // Refresh the new standalone HTML with the repository's current public rules.
-// The original index.html is read only. No student data is embedded.
+// The original 환산기.html is read only. No student data is embedded.
 const fs = require('fs');
 const path = require('path');
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const source = fs.readFileSync(path.join(root, '환산기.html'), 'utf8');
 const scripts = [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const conversion = scripts.find(s => s.includes('window.CONV9 ='));
 let engine = scripts.find(s => s.includes('window.SEOUL ='));
