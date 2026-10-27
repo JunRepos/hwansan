@@ -1,13 +1,17 @@
 // Run against a local static server: NODE_PATH=<playwright packages> node tools/test-counseling-browser.cjs
 const {chromium}=require('playwright');
 const assert=require('assert/strict'),fs=require('fs'),os=require('os'),path=require('path');
+// 화면에는 예시 성적 버튼이 없으므로, 테스트용 가상 학생을 백업 JSON으로 불러온다.
+const SAMPLE="C=>{const make=(subject,g,t,credit,rank,ach='A')=>{const hit=C.identify({subject});return {id:crypto.randomUUID(),subject,g,t,credit,rank,ach,area:hit.area,score:rank==null?null:94-rank*5,count:120,dist:'A(30) B(30) C(20) D(15) E(5)'}};const rows=[];for(const [g,t]of [[1,1],[1,2]])for(const [subject,rank,cr]of [['공통국어',3,4],['공통수학',2,4],['공통영어',2,4],['한국사',3,3],['통합사회',3,3],['통합과학',1,4],['과학탐구실험',null,1]])rows.push(make(subject+t,g,t,cr,rank));for(const [subject,rank]of [['문학',3],['대수',2],['영어Ⅰ',2],['물리학',1],['화학',2],['사회와 문화',3]])rows.push(make(subject,2,1,4,rank));const s={id:'demo',name:'예시 민준',no:1,rows,plan:[make('미적분Ⅰ',2,2,4,2),make('영어Ⅱ',2,2,4,2),make('생명과학',2,2,4,2),make('독서와 작문',2,2,4,3)],favorites:['s-seoultech:1','s-kookmin:1','s-sungshin:1'],targets:{'s-seoultech:1':{metric:'score',value:990}},conditions:{}};return s}";
 (async()=>{
  const output=process.env.HWANSAN_QA_DIR||path.join(os.tmpdir(),'hwansan-qa');fs.mkdirSync(output,{recursive:true});
  const browser=await chromium.launch({headless:true,channel:'chrome',downloadsPath:output});
  const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.HWANSAN_TEST_URL||require('url').pathToFileURL(path.resolve(__dirname,'../상담.html')).href);
- await page.getByRole('button',{name:'예시 성적 보기'}).click();
+ const sample=await page.evaluate(src=>(0,eval)(src)(window.Counsel),SAMPLE); // 가상 학생(실제 학생 자료 아님)
+ await page.locator('#file').setInputFiles({name:'sample.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,students:[sample]}))});
+ await page.locator('#apply-import').click();
  assert.equal(await page.locator('#grade-breakdown tbody tr').count(),20);
  assert.equal(await page.locator('#grade-breakdown .grade-group').count(),3);
  assert.equal(await page.locator('#grade-breakdown .achievement-heading').count(),1);
@@ -107,7 +111,7 @@ const assert=require('assert/strict'),fs=require('fs'),os=require('os'),path=req
  await page.screenshot({path:path.join(output,'hwansan-mobile-plan.png'),fullPage:true});
  await page.emulateMedia({media:'print'});await page.pdf({path:path.join(output,'hwansan-print.pdf'),format:'A4',printBackground:true});
  assert.deepEqual(errors,[]);
- console.log('PASS browser: demo, search, plan, targets, scenarios, local storage, backup content/restore, CSV, actual XLSX reading, escaping, mobile width, print; no page errors');
+ console.log('PASS browser: sample student, search, plan, targets, scenarios, local storage, backup content/restore, CSV, actual XLSX reading, escaping, mobile width, print; no page errors');
  console.log('Screenshots:',output);
  await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});
